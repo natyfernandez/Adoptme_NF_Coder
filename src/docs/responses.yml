@@ -1,0 +1,76 @@
+components:
+  schemas:
+    # Users
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID único del usuario (ObjectId)
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        pets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PetReference'
+      example:
+        _id: "507f1f77bcf86cd799439011"
+        first_name: "Juan"
+        last_name: "Pérez"
+        email: "juan@example.com"
+        role: "user"
+        pets: []
+
+    PetReference:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID de la mascota (ObjectId)
+
+    # Pets
+    Pet:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        specie:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        adopted:
+          type: boolean
+        owner:
+          $ref: '#/components/schemas/UserReference'
+        image:
+          type: string
+      example:
+        _id: "507f1f77bcf86cd799439012"
+        name: "Firulais"
+        specie: "perro"
+        birthDate: "2020-01-15"
+        adopted: false
+        image: "https://example.com/firulais.jpg"
+
+    UserReference:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del usuario (ObjectId)
+
+    # Adoptions
+    Adoption:
+      type: object
+      properties:
+        _id:
+          type: string

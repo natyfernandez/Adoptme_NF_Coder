@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "mocha test/supertest.test.js"
+    "test": "set NODE_ENV=test&& mocha \"src/test/*.test.js\" --exit"
   },
   "keywords": [],
   "author": "",
@@ -29,11 +29,15 @@
     "mongoose": "^6.7.5",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "supertest": "^6.3.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "chai": "^4.3.7",
-    "mocha": "^10.1.0"
+    "chai": "^4.5.0",
+    "chai-http": "^5.1.2",
+    "cross-env": "^7.0.3",
+    "mocha": "^10.8.2",
+    "supertest": "^7.1.1"
   }
 }

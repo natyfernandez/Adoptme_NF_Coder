@@ -1,0 +1,81 @@
+paths:
+  # Users
+  /api/users:
+    get:
+      tags: [Users]
+      summary: Obtener todos los usuarios
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    post:
+      tags: [Users]
+      summary: Crear un usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserBody'
+      responses:
+        201:
+          description: Usuario creado
+
+  /api/users/{uid}:
+    get:
+      tags: [Users]
+      summary: Obtener usuario por ID
+      parameters:
+        - in: path
+          name: uid
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  # Pets
+  /api/pets:
+    post:
+      tags: [Pets]
+      summary: Crear una mascota
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetBody'
+      responses:
+        201:
+          description: Mascota creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+
+  # Adoptions
+  /api/adoptions:
+    post:
+      tags: [Adoptions]
+      summary: Crear una adopción
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdoptionBody'
+      responses:
+        201:
+          description: Adopción registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Adoption'

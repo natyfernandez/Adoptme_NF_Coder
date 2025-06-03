@@ -1,0 +1,68 @@
+components:
+  schemas:
+    # Users
+    UserBody:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        email:
+          type: string
+          format: email
+          description: Email único del usuario
+        password:
+          type: string
+          description: Contraseña (se almacenará hasheada)
+        role:
+          type: string
+          enum: [user, admin]
+          default: user
+      required: [first_name, last_name, email, password]
+      example:
+        first_name: "Juan"
+        last_name: "Pérez"
+        email: "juan@example.com"
+        password: "123456"
+
+    # Pets
+    PetBody:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nombre de la mascota
+        specie:
+          type: string
+          description: 'Especie (ej: "perro", "gato")' 
+        birthDate:
+          type: string
+          format: date
+          description: Fecha de nacimiento (YYYY-MM-DD)
+        image:
+          type: string
+          description: URL de la imagen
+      required: [name, specie]
+      example:
+        name: "Firulais"
+        specie: "perro"
+        birthDate: "2020-01-15"
+        image: "https://example.com/firulais.jpg"
+
+    # Adoptions
+    AdoptionBody:
+      type: object
+      properties:
+        owner:
+          type: string
+          description: ID del usuario (ObjectId)
+        pet:
+          type: string
+          description: ID de la mascota (ObjectId)
+      required: [owner, pet]
+      example:
+        owner: "507f1f77bcf86cd799439011"
+        pet: "507f1f77bcf86cd799439012"
