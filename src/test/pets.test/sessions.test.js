@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import { expect } from 'chai';
-import app from '../app.js';
-import { connectDB } from '../app.js';
+import app from '../../app.js';
+import { connectDB } from '../../app.js';
 import mongoose from 'mongoose';
 
 const requester = supertest(app);

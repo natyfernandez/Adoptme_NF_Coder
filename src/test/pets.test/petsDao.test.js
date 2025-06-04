@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { connectDB } from '../app.js';
-import Pets from '../dao/Pets.dao.js';
+import { connectDB } from '../../app.js';
+import Pets from '../../dao/Pets.dao.js';
 import { expect } from 'chai';
 
 const petsDao = new Pets();

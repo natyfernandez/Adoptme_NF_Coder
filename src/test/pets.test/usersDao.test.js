@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { connectDB } from '../app.js';
-import Users from '../dao/Users.dao.js';
+import { connectDB } from '../../app.js';
+import Users from '../../dao/Users.dao.js';
 import { expect } from 'chai';
 
 const usersDao = new Users();
