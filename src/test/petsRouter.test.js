@@ -13,16 +13,18 @@ const __dirname = path.dirname(__filename);
 
 const requester = supertest(app);
 
-describe('🧪 Test de Pets Router (API Endpoints)', function() {
-    this.timeout(10000);
+describe('🧪 Test de Pets Router (API Endpoints)', function () {
+    this.timeout(10000); // Aumentamos el timeout global a 30 segundos
 
     let authToken;
     let testPetId;
+    let deletePetId;
+    let petIdSpecific;
 
     before(async () => {
         await connectDB();
-        
-        // Registrar usuario
+
+        // Registrar usuario y obtener token
         const testEmail = `test${Date.now()}@mail.com`;
         const registerRes = await requester.post('/api/sessions/register').send({
             first_name: 'Test',
@@ -30,12 +32,27 @@ describe('🧪 Test de Pets Router (API Endpoints)', function() {
             email: testEmail,
             password: 'test123'
         });
-        
-        // Asegurar que obtenemos el token correctamente
         authToken = registerRes.body.token || registerRes.text;
-        if (!authToken) {
-            throw new Error('No se pudo obtener el token de autenticación');
-        }
+
+        const createSpecificPet = await requester
+            .post('/api/pets')
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+                name: 'Original',
+                specie: 'Gato',
+                birthDate: '2021-01-01'
+            });
+        petIdSpecific = createSpecificPet.body.payload._id;
+
+        const createDeletePet = await requester
+            .post('/api/pets')
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+                name: 'Para Eliminar',
+                specie: 'Gato',
+                birthDate: '2021-01-01'
+            });
+        deletePetId = createDeletePet.body.payload._id;
     });
 
     after(async () => {
@@ -57,11 +74,10 @@ describe('🧪 Test de Pets Router (API Endpoints)', function() {
                 .set('Authorization', `Bearer ${authToken}`)
                 .send(newPet);
 
-            expect(res.status).to.be.oneOf([200, 201]);
-            
-            // Ajusta según el formato real de tu API
-            testPetId = res.body._id || res.body.payload?._id || res.body.data?._id;
-            expect(testPetId).to.exist;
+            expect(res.status).to.equal(200);
+            expect(res.body).to.have.property('status', 'success');
+            expect(res.body.payload).to.have.property('_id');
+            testPetId = res.body.payload._id;
         });
 
         it('debería retornar error 400 con datos inválidos', async () => {
@@ -71,7 +87,7 @@ describe('🧪 Test de Pets Router (API Endpoints)', function() {
                 .send({ name: 'Incomplete' });
 
             expect(res.status).to.equal(400);
-            expect(res.body).to.have.property('error');
+            expect(res.body).to.have.property('status', 'error');
         });
     });
 
@@ -82,26 +98,20 @@ describe('🧪 Test de Pets Router (API Endpoints)', function() {
                 .set('Authorization', `Bearer ${authToken}`);
 
             expect(res.status).to.equal(200);
-            expect(res.body).to.satisfy(body => 
-                Array.isArray(body) || 
-                Array.isArray(body.payload) || 
-                Array.isArray(body.data)
-            );
+            expect(res.body).to.have.property('status', 'success');
+            expect(res.body.payload).to.be.an('array');
         });
     });
 
     describe('GET /api/pets/:pid', () => {
         it('debería obtener una mascota por ID', async () => {
-            if (!testPetId) {
-                throw new Error('No se creó la mascota de prueba correctamente');
-            }
-
             const res = await requester
-                .get(`/api/pets/${testPetId}`)
+                .get(`/api/pets/${petIdSpecific}`)
                 .set('Authorization', `Bearer ${authToken}`);
 
             expect(res.status).to.equal(200);
-            expect(res.body._id || res.body.payload?._id || res.body.data?._id).to.equal(testPetId);
+            expect(res.body).to.have.property('status', 'success');
+            expect(res.body.payload).to.have.property('_id', petIdSpecific);
         });
 
         it('debería retornar 404 para mascota no encontrada', async () => {
@@ -115,38 +125,35 @@ describe('🧪 Test de Pets Router (API Endpoints)', function() {
     });
 
     describe('PUT /api/pets/:pid', () => {
-        it('debería actualizar una mascota', async function() {
-            if (!testPetId) {
-                throw new Error('No se creó la mascota de prueba correctamente');
-            }
+        it('debería actualizar una mascota', async () => {
+            const updates = {
+                name: 'Nombre Actualizado',
+                specie: 'Perro',
+                birthDate: '2020-01-01'
+            };
 
-            const updates = { name: 'Nombre Actualizado' };
             const res = await requester
-                .put(`/api/pets/${testPetId}`)
+                .put(`/api/pets/${petIdSpecific}`)
                 .set('Authorization', `Bearer ${authToken}`)
                 .send(updates);
 
             expect(res.status).to.equal(200);
-            expect(res.body.name || res.body.payload?.name || res.body.data?.name).to.equal('Nombre Actualizado');
+            expect(res.body).to.have.property('status', 'success');
+            expect(res.body.payload).to.have.property('name', 'Nombre Actualizado');
         });
     });
 
     describe('DELETE /api/pets/:pid', () => {
-        it('debería eliminar una mascota', async function() {
-            if (!testPetId) {
-                throw new Error('No se creó la mascota de prueba correctamente');
-            }
-
-            // Eliminar
+        it('debería eliminar una mascota', async () => {
             const deleteRes = await requester
-                .delete(`/api/pets/${testPetId}`)
+                .delete(`/api/pets/${deletePetId}`)
                 .set('Authorization', `Bearer ${authToken}`);
 
             expect(deleteRes.status).to.equal(200);
+            expect(deleteRes.body).to.have.property('status', 'success');
 
-            // Verificar que fue eliminada
             const checkRes = await requester
-                .get(`/api/pets/${testPetId}`)
+                .get(`/api/pets/${deletePetId}`)
                 .set('Authorization', `Bearer ${authToken}`);
 
             expect(checkRes.status).to.equal(404);
@@ -154,26 +161,44 @@ describe('🧪 Test de Pets Router (API Endpoints)', function() {
     });
 
     describe('POST /api/pets/withimage', () => {
-        it('debería crear mascota con imagen', async function() {
-            this.timeout(15000);
-            
+        it('debería crear mascota con imagen', async function () {
             const testFilePath = path.join(__dirname, 'test-image.jpg');
             fs.writeFileSync(testFilePath, 'contenido de prueba');
-            
+
             try {
                 const res = await requester
                     .post('/api/pets/withimage')
                     .set('Authorization', `Bearer ${authToken}`)
                     .field('name', 'Mascota con imagen')
                     .field('specie', 'Gato')
+                    .field('birthDate', '2022-01-01')
+                    .attach('image', testFilePath, {
+                        filename: 'test-image.jpg',
+                        contentType: 'image/jpeg'
+                    });
+
+                expect(res.status).to.equal(200);
+                expect(res.body).to.have.property('status', 'success');
+                expect(res.body.payload).to.have.property('image');
+            } finally {
+                if (fs.existsSync(testFilePath)) {
+                    fs.unlinkSync(testFilePath);
+                }
+            }
+        });
+
+        it('debería retornar error 400 si faltan datos', async function () {
+            const testFilePath = path.join(__dirname, 'test-image.jpg');
+            fs.writeFileSync(testFilePath, 'contenido de prueba');
+
+            try {
+                const res = await requester
+                    .post('/api/pets/withimage')
+                    .set('Authorization', `Bearer ${authToken}`)
                     .attach('image', testFilePath);
 
-                expect(res.status).to.be.oneOf([200, 201]);
-                expect(res.body).to.satisfy(body => 
-                    body.image !== undefined || 
-                    body.payload?.image !== undefined || 
-                    body.data?.image !== undefined
-                );
+                expect(res.status).to.equal(400);
+                expect(res.body).to.have.property('status', 'error');
             } finally {
                 if (fs.existsSync(testFilePath)) {
                     fs.unlinkSync(testFilePath);
