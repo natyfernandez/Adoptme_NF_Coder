@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const requester = supertest(app);
 
 describe('🧪 Test de Pets Router (API Endpoints)', function () {
-    this.timeout(10000); // Aumentamos el timeout global a 30 segundos
+    this.timeout(10000);
 
     let authToken;
     let testPetId;
@@ -24,7 +24,6 @@ describe('🧪 Test de Pets Router (API Endpoints)', function () {
     before(async () => {
         await connectDB();
 
-        // Registrar usuario y obtener token
         const testEmail = `test${Date.now()}@mail.com`;
         const registerRes = await requester.post('/api/sessions/register').send({
             first_name: 'Test',

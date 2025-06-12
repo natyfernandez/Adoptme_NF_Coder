@@ -8,7 +8,7 @@ import { createHash } from '../utils/index.js';
 const requester = supertest(app);
 
 describe('🚀 Adoptions Router', () => {
-    let authToken = 'mocked-token'; // Replace with actual auth
+    let authToken;
     let userId;
     let petId;
     let adoptionId;
@@ -20,21 +20,17 @@ describe('🚀 Adoptions Router', () => {
         try {
             await connectDB();
 
-            // Create test user
             const hashedPassword = await createHash('testPassword');
-            const user = {
+            const testEmail = `test${Date.now()}@mail.com`;
+            const userRes = await requester.post('/api/sessions/register').send({
                 first_name: 'Test',
                 last_name: 'User',
                 email: testEmail,
                 password: hashedPassword,
-                role: 'user',
-                pets: []
-            };
+            });
+            authToken = userRes.body.token;
+            userId = userRes.body.user.id;
 
-            const createdUser = await mongoose.connection.collection('users').insertOne(user);
-            userId = createdUser.insertedId.toString();
-
-            // Create test pet
             const petRes = await requester
                 .post('/api/pets')
                 .set('Authorization', `Bearer ${authToken}`)
@@ -62,14 +58,15 @@ describe('🚀 Adoptions Router', () => {
 
     describe('POST /api/adoptions/:uid/:pid', () => {
         it('debería crear una adopción exitosamente', async () => {
-            const res = await requester
+            const adoption = await requester
                 .post(`/api/adoptions/${userId}/${petId}`)
                 .set('Authorization', `Bearer ${authToken}`);
 
-            // Match your controller's response (200 with success message)
-            expect(res.status).to.equal(200);
-            expect(res.body).to.have.property('status', 'success');
-            expect(res.body).to.have.property('message', 'Pet adopted successfully');
+            adoptionId = adoption.body.payload._id;
+
+            expect(adoption.status).to.equal(200);
+            expect(adoption.body).to.have.property('status', 'success');
+            expect(adoption.body).to.have.property('message', 'Pet adopted successfully');
         });
 
         it('debería fallar si el usuario no existe', async () => {
@@ -84,32 +81,19 @@ describe('🚀 Adoptions Router', () => {
 
     describe('GET /api/adoptions/:aid', () => {
         it('debería obtener una adopción por ID', async () => {
-            // First create an adoption
-            const createRes = await requester
-                .post(`/api/adoptions/${userId}/${petId}`)
+            const adoption = await requester
+                .get(`/api/adoptions/${adoptionId}`)
                 .set('Authorization', `Bearer ${authToken}`);
 
-            // Get the created adoption ID from the database
-            const adoption = await mongoose.connection.collection('adoptions').findOne({
-                owner: new mongoose.Types.ObjectId(userId),
-                pet: new mongoose.Types.ObjectId(petId)
-            });
-
-            const res = await requester
-                .get(`/api/adoptions/${adoption._id}`)
-                .set('Authorization', `Bearer ${authToken}`);
-
-            expect(res.status).to.equal(200);
-            expect(res.body).to.have.property('status', 'success');
-            expect(res.body.payload).to.have.property('_id', adoption._id.toString());
+            expect(adoption.status).to.equal(200);
+            expect(adoption.body).to.have.property('status', 'success');
+            expect(adoption.body.payload).to.have.property('_id', adoptionId);
         });
     });
 
     describe('GET /api/adoptions', () => {
         beforeEach(async () => {
-            // Clear adoptions before each test
             await mongoose.connection.db.collection('adoptions').deleteMany({});
-            // Reset pet adoption status
             await mongoose.connection.db.collection('pets').updateOne(
                 { _id: new mongoose.Types.ObjectId(petId) },
                 { $set: { adopted: false } }

@@ -19,7 +19,6 @@ describe('🧪 Test de Users Router (API Endpoints)', function () {
         try {
             await connectDB();
 
-            // Crear usuario de prueba
             const hashedPassword = await createHash(testPassword);
             const user = {
                 first_name: 'Test',
@@ -32,7 +31,6 @@ describe('🧪 Test de Users Router (API Endpoints)', function () {
             const createdUser = await mongoose.connection.collection('users').insertOne(user);
             testUserId = createdUser.insertedId.toString();
 
-            // Obtener token de autenticación
             const loginRes = await requester.post('/api/sessions/login').send({
                 email: testEmail,
                 password: testPassword
@@ -113,7 +111,6 @@ describe('🧪 Test de Users Router (API Endpoints)', function () {
             expect(res.body).to.have.property('status', 'success');
             expect(res.body.payload.first_name).to.equal('Updated');
 
-            // Verificar que realmente se actualizó en la base de datos
             const updatedUser = await mongoose.connection.collection('users').findOne({ 
                 _id: new mongoose.Types.ObjectId(testUserId) 
             });
@@ -135,7 +132,6 @@ describe('🧪 Test de Users Router (API Endpoints)', function () {
 
     describe('DELETE /api/users/:uid', function () {
         it('debería eliminar un usuario existente', async function () {
-            // Crear un usuario específico para eliminar (no usar el principal)
             const userToDelete = {
                 first_name: 'ToDelete',
                 last_name: 'User',
@@ -151,7 +147,6 @@ describe('🧪 Test de Users Router (API Endpoints)', function () {
 
             expect(res.status).to.equal(200);
 
-            // Verificar que realmente se eliminó
             const deletedUser = await mongoose.connection.collection('users').findOne({ 
                 _id: new mongoose.Types.ObjectId(userIdToDelete) 
             });

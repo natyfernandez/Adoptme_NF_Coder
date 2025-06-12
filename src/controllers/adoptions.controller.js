@@ -1,6 +1,7 @@
 import { isValidObjectId } from 'mongoose'; 
 import { adoptionsService, petsService, usersService } from "../services/index.js";
 import mongoose from "mongoose";
+import userModel from '../dao/models/User.js';
 
 const getAllAdoptions = async (req, res) => {
     try {
@@ -24,7 +25,7 @@ const getAdoption = async (req, res) => {
         }
 
         const adoption = await adoptionsService.getBy(adoptionId);
-        console.log("Adopcion encontrada:", adoption); // Depuración
+        console.log("Adopcion encontrada:", adoption);
 
         if (!adoption) {
             console.log(`Adopcion no encontrada, ${adoptionId}`)
@@ -42,14 +43,8 @@ const createAdoption = async (req, res) => {
     try {
         const { uid, pid } = req.params;
 
-        // Verificar usuario
         const user = await usersService.getUserById(uid);
-        if (!user) {
-            console.error('User not found')
-            return res.status(404).send({ status: "error", error: "User not found" });
-        }
 
-        // Verificar mascota
         const pet = await petsService.getBy(pid);
         if (!pet) {
             console.error('Pet not found')

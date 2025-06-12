@@ -37,7 +37,6 @@ describe('🧪 Test de sesiones', function() {
     });
 
     it('POST /api/sessions/login → debería loguear correctamente con token', async () => {
-        // 1. Registrar usuario primero
         const testEmail = `test${Date.now()}@mail.com`;
         const testPassword = 'test123';
 
@@ -48,7 +47,6 @@ describe('🧪 Test de sesiones', function() {
             password: testPassword
         });
 
-        // 2. Hacer login
         const loginRes = await requester.post('/api/sessions/login').send({
             email: testEmail,
             password: testPassword

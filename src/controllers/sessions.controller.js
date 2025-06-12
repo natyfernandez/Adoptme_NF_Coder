@@ -7,7 +7,6 @@ const register = async (req, res) => {
     try {
         const { first_name, last_name, email, password } = req.body;
         
-        // Validación de campos requeridos
         if (!first_name || !last_name || !email || !password) {
             return res.status(400).json({ 
                 status: "error", 
@@ -15,7 +14,6 @@ const register = async (req, res) => {
             });
         }
 
-        // Verificar si el usuario ya existe
         const exists = await usersService.getUserByEmail(email);
         if (exists) {
             return res.status(400).json({ 
@@ -24,28 +22,23 @@ const register = async (req, res) => {
             });
         }
 
-        // Crear hash de la contraseña
         const hashedPassword = await createHash(password);
         
-        // Crear objeto de usuario
         const user = {
             first_name,
             last_name,
             email,
             password: hashedPassword,
-            role: 'user' // Asignar rol por defecto
+            role: 'user'
         };
 
-        // Guardar usuario en la base de datos
         const result = await usersService.create(user);
         
-        // Generar token JWT
         const userDto = UserDTO.getUserTokenFrom(result);
         const token = jwt.sign(userDto, process.env.JWT_SECRET || 'tokenSecretJWT', { 
             expiresIn: process.env.JWT_EXPIRES_IN || "1h" 
         });
 
-        // Configurar cookie y enviar respuesta
         res.cookie('coderCookie', token, { 
             maxAge: 3600000, 
             httpOnly: true,
@@ -75,7 +68,6 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        // Validación de campos requeridos
         if (!email || !password) {
             return res.status(400).json({ 
                 status: "error", 
@@ -83,7 +75,6 @@ const login = async (req, res) => {
             });
         }
 
-        // Buscar usuario en la base de datos
         const user = await usersService.getUserByEmail(email);
         if (!user) {
             return res.status(404).json({ 
@@ -92,7 +83,6 @@ const login = async (req, res) => {
             });
         }
 
-        // Validar contraseña
         const isValidPassword = await passwordValidation(user, password);
         if (!isValidPassword) {
             return res.status(401).json({ 
@@ -101,18 +91,15 @@ const login = async (req, res) => {
             });
         }
 
-        // Generar token JWT
         const userDto = UserDTO.getUserTokenFrom(user);
         const token = jwt.sign(userDto, process.env.JWT_SECRET || 'tokenSecretJWT', { 
             expiresIn: process.env.JWT_EXPIRES_IN || "1h" 
         });
 
-        // Actualizar última conexión
         await usersService.updateUser(user._id, { 
             last_connection: new Date() 
         });
 
-        // Configurar cookie y enviar respuesta
         res.cookie('coderCookie', token, { 
             maxAge: 3600000, 
             httpOnly: true,
@@ -139,8 +126,6 @@ const login = async (req, res) => {
 
 const current = async (req, res) => {
     try {
-        // El middleware de autenticación ya verificó el token
-        // y adjuntó el usuario a req.user
         if (req.user) {
             return res.status(200).json({ 
                 status: "success", 

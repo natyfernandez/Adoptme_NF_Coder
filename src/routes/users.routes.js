@@ -21,7 +21,7 @@ usersRouter.post('/:uid/documents', uploader.array('documents'), async (req, res
 
         const documents = files.map(file => ({
             name: file.originalname,
-            reference: file.path.replace(/\\/g, '/') // para evitar problemas con backslashes en Windows
+            reference: file.path.replace(/\\/g, '/')
         }));
 
         const updatedUser = await userModel.findByIdAndUpdate(
