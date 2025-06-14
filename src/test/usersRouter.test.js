@@ -1,9 +1,9 @@
 import supertest from 'supertest';
 import { expect } from 'chai';
-import app from '../../app.js';
-import { connectDB } from '../../app.js';
+import app from '../app.js';
+import { connectDB } from '../app.js';
 import mongoose from 'mongoose';
-import { createHash } from '../../utils/index.js';
+import { createHash } from '../utils/index.js';
 
 const requester = supertest(app);
 

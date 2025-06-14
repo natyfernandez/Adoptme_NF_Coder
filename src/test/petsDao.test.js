@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { connectDB } from '../../app.js';
-import Pets from '../../dao/Pets.dao.js';
+import { connectDB } from '../app.js';
+import Pets from '../dao/Pets.dao.js';
 import { expect } from 'chai';
 
 const petsDao = new Pets();
@@ -33,12 +33,14 @@ describe('🧪 Test DAO de Mascotas', () => {
         expect(result.name).to.equal(petMock.name);
     });
 
-    it('debería obtener una mascota por nombre', async () => {
-        await petsDao.save({ name: 'Michi', specie: 'Gato' });
+    it('debería obtener una mascota por id', async () => {
+        const pet = await petsDao.save({ name: 'Michi', specie: 'Gato' });
 
-        const pet = await petsDao.getBy({ name: 'Michi' });
-        expect(pet).to.exist;
-        expect(pet.specie).to.equal('Gato');
+        const petId = pet._id
+
+        const resPet = await petsDao.getBy(petId);
+        expect(resPet).to.exist;
+        expect(resPet.specie).to.equal('Gato');
     });
 
     it('debería actualizar una mascota', async () => {

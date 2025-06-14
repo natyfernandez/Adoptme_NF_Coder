@@ -8,5 +8,10 @@
 4. Ejecuta:
 
 ```bash
-docker pull natyfernandez/server-docker
-docker run -p 9000:8080 natyfernandez/server-docker
+docker compose up
+
+o
+
+docker pull natyfernandez/server-docker:1.0.0
+docker run -p 8000:8000 natyfernandez/server-docker:1.0.0
+

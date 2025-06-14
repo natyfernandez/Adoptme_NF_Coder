@@ -11,6 +11,10 @@ export default class Users {
         return userModel.findOne(params);
     }
 
+    getById = (id) => {
+        return userModel.findById(id);
+    }
+
     save = (doc) => {
         return userModel.create(doc);
     }

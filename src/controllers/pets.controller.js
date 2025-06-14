@@ -19,14 +19,14 @@ const createPet = async (req, res) => {
 const getPet = async (req, res) => {
     try {
         const petId = req.params.pid;
-        console.log("ID recibido:", petId); // Depuración
+        console.log("ID recibido:", petId);
 
         if (!petId || !isValidObjectId(petId)) {
             return res.status(400).send({ status: "error", error: "Invalid ID format" });
         }
 
         const pet = await petsService.getBy(petId);
-        console.log("Pet encontrada:", pet); // Depuración
+        console.log("Pet encontrada:", pet);
 
         if (!pet) {
             return res.status(404).send({ status: "error", error: "Pet not found" });
@@ -34,7 +34,7 @@ const getPet = async (req, res) => {
 
         res.send({ status: "success", payload: pet });
     } catch (error) {
-        console.error("Error en getPet:", error); // Depuración
+        console.error("Error en getPet:", error);
         res.status(500).send({ status: "error", error: error.message });
     }
 }
@@ -68,7 +68,6 @@ const deletePet = async (req, res) => {
     try {
         const petId = req.params.pid;
 
-        // Validar ID
         if (!petId || !isValidObjectId(petId)) {
             return res.status(400).send({ status: "error", error: "Invalid ID format" });
         }

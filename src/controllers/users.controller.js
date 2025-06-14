@@ -58,7 +58,6 @@ const updateUser = async (req, res) => {
         const updateBody = req.body;
         const userId = req.params.uid;
 
-        // Validación más estricta
         if (updateBody.email && !/^\S+@\S+\.\S+$/.test(updateBody.email)) {
             return res.status(400).send({
                 status: "error",
@@ -76,7 +75,7 @@ const updateUser = async (req, res) => {
             status: "success",
             payload: {
                 _id: updatedUser._id,
-                first_name: updatedUser.first_name, // Mostrará 'Updated' si se cambió
+                first_name: updatedUser.first_name,
                 last_name: updatedUser.last_name,
                 email: updatedUser.email,
                 role: updatedUser.role

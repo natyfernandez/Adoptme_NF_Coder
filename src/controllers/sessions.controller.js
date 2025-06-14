@@ -14,7 +14,7 @@ const register = async (req, res) => {
             });
         }
 
-        const exists = await usersService.getUserByEmail(email);
+        const exists = await usersService.getBy({email: email});
         if (exists) {
             return res.status(400).json({ 
                 status: "error", 
@@ -75,7 +75,7 @@ const login = async (req, res) => {
             });
         }
 
-        const user = await usersService.getUserByEmail(email);
+        const user = await usersService.getUserBy({email: email});
         if (!user) {
             return res.status(404).json({ 
                 status: "error", 
@@ -156,7 +156,7 @@ const unprotectedLogin = async (req, res) => {
             });
         }
 
-        const user = await usersService.getUserByEmail(email);
+        const user = await usersService.getUserBy({email: email});
         if (!user) {
             return res.status(404).json({ 
                 status: "error", 

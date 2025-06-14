@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import { expect } from 'chai';
-import app from '../../app.js';
-import { connectDB } from '../../app.js';
+import app from '../app.js';
+import { connectDB } from '../app.js';
 import mongoose from 'mongoose';
 
 const requester = supertest(app);
@@ -37,7 +37,7 @@ describe('🧪 Test de sesiones', function() {
     });
 
     it('POST /api/sessions/login → debería loguear correctamente con token', async () => {
-        const testEmail = `test${Date.now()}@mail.com`;
+        const testEmail = `test@mail.com`;
         const testPassword = 'test123';
 
         await requester.post('/api/sessions/register').send({

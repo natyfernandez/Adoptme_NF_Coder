@@ -5,12 +5,12 @@ export default class UserRepository extends GenericRepository {
         super(dao);
     }
     
-    getUserByEmail = (email) => {
-        return this.getBy({email});
+    getUserBy = (params) => {
+        return this.getBy(params);
     }
-    
+
     getUserById = (id) => {
-        return this.getBy({_id: id});
+        return this.getById(id);
     }
     
     updateUser = (id, userData) => {

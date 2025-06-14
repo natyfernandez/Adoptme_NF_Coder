@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { connectDB } from '../../app.js';
-import Users from '../../dao/Users.dao.js';
+import { connectDB } from '../app.js';
+import Users from '../dao/Users.dao.js';
 import { expect } from 'chai';
 
 const usersDao = new Users();
@@ -14,11 +14,11 @@ describe('🧪 Test DAO de Usuarios', () => {
     });
 
     afterEach(async () => {
-        await mongoose.connection.collection('users').deleteMany({}); // limpia luego de cada test
+        await mongoose.connection.collection('users').deleteMany({});
     });
 
     after(async () => {
-        await mongoose.connection.close(); // cierra conexión luego de todos los tests
+        await mongoose.connection.close();
     });
 
     it('debería guardar un usuario correctamente', async () => {

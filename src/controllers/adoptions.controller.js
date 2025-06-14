@@ -1,7 +1,5 @@
 import { isValidObjectId } from 'mongoose'; 
 import { adoptionsService, petsService, usersService } from "../services/index.js";
-import mongoose from "mongoose";
-import userModel from '../dao/models/User.js';
 
 const getAllAdoptions = async (req, res) => {
     try {
@@ -24,7 +22,7 @@ const getAdoption = async (req, res) => {
             return res.status(400).send({ status: "error", error: "Invalid ID format" });
         }
 
-        const adoption = await adoptionsService.getBy(adoptionId);
+        const adoption = await adoptionsService.getBy({_id: adoptionId});
         console.log("Adopcion encontrada:", adoption);
 
         if (!adoption) {
@@ -44,6 +42,10 @@ const createAdoption = async (req, res) => {
         const { uid, pid } = req.params;
 
         const user = await usersService.getUserById(uid);
+        if (!user) {
+            console.error('User not found')
+            return res.status(404).send({ status: "error", error: "User not found" });
+        }
 
         const pet = await petsService.getBy(pid);
         if (!pet) {
@@ -67,11 +69,11 @@ const createAdoption = async (req, res) => {
             { adopted: true, owner: user._id },
         );
 
-        await adoptionsService.create(
+        const adoption = await adoptionsService.create(
             { owner: user._id, pet: pet._id },
         );
 
-        res.send({ status: "success", message: "Pet adopted successfully" });
+        res.send({ status: "success", payload: adoption, message: "Pet adopted successfully" });
     } catch (error) {
         console.error("Error in adoption process:", error);
         res.status(500).send({

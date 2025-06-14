@@ -1,13 +1,12 @@
 import supertest from 'supertest';
 import { expect } from 'chai';
-import app from '../../app.js';
-import { connectDB } from '../../app.js';
+import app from '../app.js';
+import { connectDB } from '../app.js';
 import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
-// Configuración para __dirname en ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
